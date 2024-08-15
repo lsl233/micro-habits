@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Habit } from '../types/habit'; // Assuming Habit is defined in this file
 
 export class Storage {
