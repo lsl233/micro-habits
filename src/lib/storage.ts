@@ -39,3 +39,30 @@ export class Storage {
         return Storage.get<Habit[]>('habits');
     }
 }
+
+
+export const useHabits: () => [Habit[], (habit: Habit) => void] = () => {
+    const [habits, _setHabits] = useState<Habit[]>([]);
+
+    useEffect(() => {
+        const storedHabits = Storage.get<Habit[]>('habits');
+        if (storedHabits) {
+            _setHabits(storedHabits);
+        }
+    }, []);
+    
+    const setHabits = (habit: Habit) => {
+        for (const h of habits) {
+            if (h.id === habit.id) {
+                Object.assign(h, habit);
+                _setHabits([...habits]);
+                Storage.set('habits', habits);
+                return
+            }
+        }
+        habits.push(habit);
+        _setHabits([...habits]);
+        Storage.set('habits', habits);
+    }
+    return [habits, setHabits];
+}

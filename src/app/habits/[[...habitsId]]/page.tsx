@@ -25,8 +25,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Storage } from "@/lib/storage";
+import { Storage, useHabits } from "@/lib/storage";
 import { useRouter } from "next/navigation";
+import { Habit } from "@/types/habit";
+import { useEffect, useMemo } from "react";
+import { Unit, Type } from "@/lib/enum";
+import { enumKeys } from "@/lib/utils";
 
 const FormSchema = z.object({
   id: z.string(),
@@ -37,15 +41,17 @@ const FormSchema = z.object({
   unit: z.string().min(1, { message: "请选择单位" }),
   count: z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
   completed: z.boolean().default(false),
-  createdAt: z.string().default(new Date().getTime().toString()),
-  updatedAt: z.string().default(new Date().getTime().toString()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
-  const router = useRouter()
+  const router = useRouter();
   const habitsId = params?.habitsId?.[0] || new Date().getTime().toString();
-  const units = ["杯", "个", "次", "页", "米", "公里", "分钟", "小时"];
-  const types = ["每天", "每周", "每月"];
+  const units = enumKeys(Unit);
+  const types = enumKeys(Type);
+  const [habits, setHabits] = useHabits();
+  const habit = habits.find((item) => item.id === habitsId);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -56,16 +62,37 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
       unit: "",
       type: "",
       completed: false,
+      createdAt: "",
+      updatedAt: "",
     },
   });
 
-  const texts = form.watch(["type", "title", "count", "unit"]);
+  useEffect(() => {
+    if (habit) {
+      form.reset({
+        id: habit.id,
+        title: habit.title,
+        type: habit.type?.toString() || "",
+        unit: habit.unit?.toString() || "",
+        count: habit.count,
+        completed: habit.completed,
+        createdAt: habit.createdAt,
+        updatedAt: habit.updatedAt,
+      });
+    }
+  }, [form, habit]);
 
-
+  const fields = form.watch();
+  
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    Storage.append("habits", data);
-    toast.success("You submitted the following values");
-    router.replace('/')
+    const habitData: Habit = {
+      ...data,
+      type: data.type as unknown as Type,
+      unit: data.unit as unknown as Unit,
+    };
+    setHabits(habitData);
+    toast.success("习惯已保存");
+    router.replace("/");
   }
 
   return (
@@ -83,9 +110,8 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
                 <FormItem className="md:w-1/2 w-full">
                   <FormLabel>动作</FormLabel>
                   <FormControl>
-                    <Input placeholder="动作" {...field} />
+                    <Input placeholder="e.g.看书" {...field} />
                   </FormControl>
-                  <FormDescription>比如：喝水</FormDescription>
                   <FormMessage />
                 </FormItem>
               );
@@ -101,12 +127,11 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="数量"
+                      placeholder="e.g.1"
                       {...field}
                       className="text-center"
                     />
                   </FormControl>
-                  <FormDescription>比如：1</FormDescription>
                   <FormMessage />
                 </FormItem>
               );
@@ -117,17 +142,27 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
             name="unit"
             render={({ field }) => {
               return (
-                <FormItem className="md:w-1/4 w-full">
+                <FormItem key={field.value} className="md:w-1/4 w-full">
                   <FormLabel>单位</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder="" />
+                        <SelectValue
+                          placeholder={
+                            <span className="text-gray-500">e.g.页</span>
+                          }
+                        />
                       </SelectTrigger>
-                      <SelectContent {...field}>
+                      <SelectContent>
                         <SelectGroup>
                           {units.map((unit) => (
-                            <SelectItem value={unit} key={unit}>
+                            <SelectItem
+                              value={String(Unit[unit])}
+                              key={Unit[unit]}
+                            >
                               {unit}
                             </SelectItem>
                           ))}
@@ -135,7 +170,6 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormDescription>比如：杯</FormDescription>
                   <FormMessage />
                 </FormItem>
               );
@@ -148,17 +182,27 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
             name="type"
             render={({ field }) => {
               return (
-                <FormItem className="md:w-1/4 w-full">
+                <FormItem key={field.value} className="md:w-1/4 w-full">
                   <FormLabel>时间类型</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder="" />
+                        <SelectValue
+                          placeholder={
+                            <span className="text-gray-500">e.g.每天</span>
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
                           {types.map((type) => (
-                            <SelectItem value={type} key={type}>
+                            <SelectItem
+                              value={String(Type[type])}
+                              key={Type[type]}
+                            >
                               {type}
                             </SelectItem>
                           ))}
@@ -166,16 +210,18 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormDescription>比如：每周</FormDescription>
                   <FormMessage />
                 </FormItem>
               );
             }}
           />
         </div>
-        <p className="mt-4">{texts.join("")}</p>
+        <p className="mt-4">
+          {Type[Number(fields.type)]}
+          {fields.title} {fields.count} {Unit[Number(fields.unit)]}
+        </p>
         <Button type="submit" className="mt-4">
-          Submit
+          创 建
         </Button>
       </form>
     </Form>

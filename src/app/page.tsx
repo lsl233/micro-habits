@@ -1,19 +1,43 @@
 "use client";
 
-import { Storage } from "@/lib/storage";
+import { Storage, useHabits } from "@/lib/storage";
 import { Habit } from "@/types/habit";
 import HabitItem from "./_components/habit-item";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import CompleteDrawer, { formSchema } from "./_components/complete-drawer";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { z } from "zod";
 
 export default function Home() {
-  const [habits, setHabits] = useState<Habit[]>([]);
+  const [habits] = useHabits();
+  const [completeDrawerOpen, setCompleteDrawerOpen] = useState(false);
+  const [currentHabit, setCurrentHabit] = useState<Habit | undefined>();
+  const router = useRouter();
 
-  useEffect(() => {
-    setHabits(Storage.get<Habit[]>("habits"));
-  }, []);
+  const handleChange = (habit: Habit, checked: boolean) => {
+    if (checked) {
+      setCompleteDrawerOpen(checked);
+      setCurrentHabit(habit);
+    }
+  };
+  
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (currentHabit) {
+      Storage.setItem<Habit>("habits", (item) => {
+        if (item.id === currentHabit.id) {
+          item.completed = true;
+          item.count = values.count;
+          return true;
+        }
+        return false;
+      });
+      setCompleteDrawerOpen(false);
+      router.refresh();
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col p-6">
@@ -26,9 +50,11 @@ export default function Home() {
       </Link>
       <div className="flex flex-col space-y-2">
         {habits.map((habit) => (
-          <HabitItem habit={habit} key={habit.id} />
+          <HabitItem habit={habit} key={habit.id} onChange={handleChange} />
         ))}
       </div>
+      
+      <CompleteDrawer onSubmit={onSubmit} open={completeDrawerOpen} habit={currentHabit} />
     </main>
   );
 }

@@ -3,30 +3,32 @@
 import { Storage } from "@/lib/storage";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Habit } from "@/types/habit";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { Unit, Type } from "@/lib/enum";
 
-const HabitItem = ({ habit }: { habit: Habit }) => {
-  const router = useRouter();
-  const handleChange = (checked: boolean) => {
-    Storage.setItem<Habit>("habits", (item) => {
-      if (item.id === habit.id) {
-        item.completed = checked;
-        return true;
-      }
-      return false;
-    });
-    router.refresh();
-  };
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { SquareCheckBig, SquareMinus } from "lucide-react";
+
+const HabitItem = ({
+  habit,
+  onChange: onChange,
+}: {
+  habit: Habit;
+  onChange: (habit: Habit, checked: boolean) => void;
+}) => {
+  console.log(Unit);
   return (
     <div className="flex justify-between items-center border rounded-md py-2 px-3">
       <Link href={`/habits/${habit.id}`}>
         <h2 className="text-md">
-          {habit.type}
-          {habit.title} {habit.count} {habit.unit}
+          {habit.type !== undefined ? Type[habit.type] : ""}
+          {habit.title} {habit.count}{" "}
+          {habit.unit !== undefined ? Unit[habit.unit] : ""}
         </h2>
       </Link>
-      <Checkbox onCheckedChange={handleChange} />
+      <Button variant="link" size="icon" className="h-auto">
+        {habit.completed ? <SquareMinus className="text-gray-500" /> : <SquareCheckBig />}
+      </Button>
     </div>
   );
 };
