@@ -39,7 +39,7 @@ const FormSchema = z.object({
   }),
   type: z.string().min(1, { message: "请选择时间类型" }),
   unit: z.string().min(1, { message: "请选择单位" }),
-  count: z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
+  amount: z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
   completed: z.boolean().default(false),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -58,12 +58,12 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
     defaultValues: {
       id: habitsId,
       title: "",
-      count: "",
+      amount: "",
       unit: "",
       type: "",
       completed: false,
-      createdAt: "",
-      updatedAt: "",
+      createdAt: new Date().getTime().toString(),
+      updatedAt: new Date().getTime().toString(),
     },
   });
 
@@ -74,16 +74,16 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
         title: habit.title,
         type: habit.type?.toString() || "",
         unit: habit.unit?.toString() || "",
-        count: habit.count,
+        amount: habit.amount,
         completed: habit.completed,
-        createdAt: habit.createdAt,
-        updatedAt: habit.updatedAt,
+        createdAt: habit.createdAt || new Date().getTime().toString(),
+        updatedAt: habit.updatedAt || new Date().getTime().toString(),
       });
     }
   }, [form, habit]);
 
   const fields = form.watch();
-  
+
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const habitData: Habit = {
       ...data,
@@ -119,7 +119,7 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
           />
           <FormField
             control={form.control}
-            name="count"
+            name="amount"
             render={({ field }) => {
               return (
                 <FormItem className="md:w-1/4 w-full">
@@ -218,7 +218,7 @@ const HabitsIdPage = ({ params }: { params: { habitsId: string } }) => {
         </div>
         <p className="mt-4">
           {Type[Number(fields.type)]}
-          {fields.title} {fields.count} {Unit[Number(fields.unit)]}
+          {fields.title} {fields.amount} {Unit[Number(fields.unit)]}
         </p>
         <Button type="submit" className="mt-4">
           创 建

@@ -40,8 +40,33 @@ export class Storage {
     }
 }
 
+export const useStorage = <T>(key: string, initValue: T): [T, React.Dispatch<React.SetStateAction<T>>, (value: any) => void] => {
+    const [data, setData] = useState<T>(initValue);
 
-export const useHabits: () => [Habit[], (habit: Habit) => void] = () => {
+    useEffect(() => {
+        const storedData = Storage.get<T>(key);
+        setData(storedData);
+    }, [key]);
+
+    useEffect(() => {
+        Storage.set(key, data);
+    }, [data, key]);
+
+    const updateData = (value: any) => {
+        if (Array.isArray(data)) {
+            setData([...data, ...value] as T)
+        } else if(typeof data === 'object' && typeof value === 'object') {
+            setData({ ...data, ...value } as T);
+        } else {
+            setData(value as T);
+        }
+    }
+
+    return [data, setData, updateData];
+}
+
+
+export const useHabits: () => [Habit[], (habit: Habit) => void, (id: string, habit: Partial<Habit>) => void] = () => {
     const [habits, _setHabits] = useState<Habit[]>([]);
 
     useEffect(() => {
@@ -64,5 +89,16 @@ export const useHabits: () => [Habit[], (habit: Habit) => void] = () => {
         _setHabits([...habits]);
         Storage.set('habits', habits);
     }
-    return [habits, setHabits];
+
+    const updateHabit = (id: string, habit: Partial<Habit>) => {
+        for (const h of habits) {
+            if (h.id === id) {
+                Object.assign(h, habit);
+                _setHabits([...habits]);
+                Storage.set('habits', habits);
+                return
+            }
+        }
+    }
+    return [habits, setHabits, updateHabit];
 }

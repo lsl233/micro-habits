@@ -26,9 +26,7 @@ import { Storage } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 
 export const formSchema = z.object({
-  count: z.coerce.number().min(1, {
-    message: "Count must be at least 1.",
-  }),
+  amount:  z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
 });
 
 const CompleteDrawer = ({ habit, open, onSubmit }: { habit?: Habit; open: boolean; onSubmit: (values: z.infer<typeof formSchema>) => void }) => {
@@ -36,7 +34,7 @@ const CompleteDrawer = ({ habit, open, onSubmit }: { habit?: Habit; open: boolea
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      count: habit?.count,
+      amount: habit?.amount,
     },
   });
 
@@ -55,7 +53,7 @@ const CompleteDrawer = ({ habit, open, onSubmit }: { habit?: Habit; open: boolea
             <div>
               <FormField
                 control={form.control}
-                name="count"
+                name="amount"
                 render={({ field }) => {
                   return (
                     <FormItem className="w-full">

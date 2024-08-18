@@ -1,7 +1,7 @@
 "use client";
 
-import { Storage, useHabits } from "@/lib/storage";
-import { Habit } from "@/types/habit";
+import { Storage, useHabits, useStorage } from "@/lib/storage";
+import { Habit, Record } from "@/types/habit";
 import HabitItem from "./_components/habit-item";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -12,7 +12,8 @@ import { useState } from "react";
 import { z } from "zod";
 
 export default function Home() {
-  const [habits] = useHabits();
+  const [record, setRecord, updateRecord] = useStorage<Record[]>("record", []);
+  const [habits, setHabits, updateHabit] = useHabits();
   const [completeDrawerOpen, setCompleteDrawerOpen] = useState(false);
   const [currentHabit, setCurrentHabit] = useState<Habit | undefined>();
   const router = useRouter();
@@ -23,17 +24,27 @@ export default function Home() {
       setCurrentHabit(habit);
     }
   };
-  
+
+  const handleCancelComplete = (habitId: string) => {
+    setRecord(record.filter(r => r.habitId !== habitId));
+  }
+
+  const handleOpenCompleteDrawer = (habit: Habit) => {
+    setCompleteDrawerOpen(true);
+    setCurrentHabit(habit);
+  }
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (currentHabit) {
-      Storage.setItem<Habit>("habits", (item) => {
-        if (item.id === currentHabit.id) {
-          item.completed = true;
-          item.count = values.count;
-          return true;
-        }
-        return false;
-      });
+      updateRecord([{
+        habitId: currentHabit.id,
+        id: new Date().getTime().toString(),
+        amount: values.amount,
+        completed: true,
+        createdAt: new Date().getTime().toString(),
+        updatedAt: new Date().getTime().toString()
+      }])
+      // updateHabit(currentHabit.id, { completed: true });
       setCompleteDrawerOpen(false);
       router.refresh();
     }
@@ -50,7 +61,7 @@ export default function Home() {
       </Link>
       <div className="flex flex-col space-y-2">
         {habits.map((habit) => (
-          <HabitItem habit={habit} key={habit.id} onChange={handleChange} />
+          <HabitItem habit={habit} key={habit.id} onCancelComplete={handleCancelComplete} onOpenCompleteDrawer={handleOpenCompleteDrawer} />
         ))}
       </div>
       
