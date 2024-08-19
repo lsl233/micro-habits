@@ -24,19 +24,34 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Storage } from "@/lib/storage";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export const formSchema = z.object({
   amount:  z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
 });
 
-const CompleteDrawer = ({ habit, open, onSubmit }: { habit?: Habit; open: boolean; onSubmit: (values: z.infer<typeof formSchema>) => void }) => {
+const CompleteDrawer = ({ habitId, open, onSwitchDrawer }: { habitId: string; open: boolean; onSwitchDrawer: () => void }) => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: habit?.amount,
+      amount: 1,
     },
   });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // TODO: 提交
+    try {
+      await axios.post(`/api/todo`, { amount: values.amount, habitId });
+      onSwitchDrawer();
+      router.refresh();
+      toast.success("提交成功");
+    } catch (error) {
+      console.log(error);
+      toast.error("提交失败");
+    }
+  }
 
   return (
     <Drawer open={open}>
@@ -74,7 +89,7 @@ const CompleteDrawer = ({ habit, open, onSubmit }: { habit?: Habit; open: boolea
 
             <DrawerFooter className="flex justify-center flex-row">
               <Button type="submit">提交</Button>
-              <Button variant="outline">取消</Button>
+              <Button onClick={onSwitchDrawer} variant="outline">取消</Button>
             </DrawerFooter>
           </form>
         </Form>

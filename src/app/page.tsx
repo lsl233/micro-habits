@@ -1,54 +1,90 @@
-"use client";
 
-import { Storage, useHabits, useStorage } from "@/lib/storage";
-import { Habit, Record } from "@/types/habit";
-import HabitItem from "./_components/habit-item";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import CompleteDrawer, { formSchema } from "./_components/complete-drawer";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { z } from "zod";
+import { db } from "@/lib/db";
+import { OneDayTodo } from "@/types";
+import { TodoList } from "./_components/todo-list";
+import { Todo } from "@prisma/client";
 
-export default function Home() {
-  const [record, setRecord, updateRecord] = useStorage<Record[]>("record", []);
-  const [habits, setHabits, updateHabit] = useHabits();
-  const [completeDrawerOpen, setCompleteDrawerOpen] = useState(false);
-  const [currentHabit, setCurrentHabit] = useState<Habit | undefined>();
-  const router = useRouter();
+export default async function Home() {
+  const todayTodo: OneDayTodo[] = [];
 
-  const handleChange = (habit: Habit, checked: boolean) => {
-    if (checked) {
-      setCompleteDrawerOpen(checked);
-      setCurrentHabit(habit);
+  const habits = await db.habit.findMany({
+    include: {
+      records: true,
+    },
+  });
+
+  for (const habit of habits) {
+    if (habit.cycleTimeType === "0") {
+      if (habit.records.length) {
+        const res = await db.todo.findMany({
+          where: {
+            createdAt: {
+              gte: new Date(new Date().setHours(0, 0, 0, 0)),
+              lt: new Date(new Date().setHours(23, 59, 59, 999)),
+            },
+          },
+        })
+        todayTodo.concat(res as OneDayTodo[])
+      } else {
+        todayTodo.push({
+          habitId: habit.id,
+          amount: habit.amount,
+          title: `${habit.cycleTimeType} ${habit.action} ${habit.amount} ${habit.unit}`,
+          completed: false,
+        });
+      }
     }
-  };
-
-  const handleCancelComplete = (habitId: string) => {
-    setRecord(record.filter(r => r.habitId !== habitId));
   }
 
-  const handleOpenCompleteDrawer = (habit: Habit) => {
-    setCompleteDrawerOpen(true);
-    setCurrentHabit(habit);
-  }
+  // 每天执行一次
+  console.log("[Todo]", todayTodo);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (currentHabit) {
-      updateRecord([{
-        habitId: currentHabit.id,
-        id: new Date().getTime().toString(),
-        amount: values.amount,
-        completed: true,
-        createdAt: new Date().getTime().toString(),
-        updatedAt: new Date().getTime().toString()
-      }])
-      // updateHabit(currentHabit.id, { completed: true });
-      setCompleteDrawerOpen(false);
-      router.refresh();
-    }
-  };
+  // console.log(habits)
+
+  // const [record, setRecord, updateRecord] = useStorage<Record[]>("record", []);
+  // const [habits, setHabits, updateHabit] = useHabits();
+  // const [completeDrawerOpen, setCompleteDrawerOpen] = useState(false);
+  // const [currentHabit, setCurrentHabit] = useState<Habit | undefined>();
+  // const router = useRouter();
+
+  // const handleChange = (habit: Habit, checked: boolean) => {
+  //   if (checked) {
+  //     setCompleteDrawerOpen(checked);
+  //     setCurrentHabit(habit);
+  //   }
+  // };
+
+  // const handleCancelComplete = (habitId: string) => {
+  //   setRecord(record.filter(r => r.habitId !== habitId));
+  // }
+
+  // const handleOpenCompleteDrawer = (habit: Habit) => {
+  //   setCompleteDrawerOpen(true);
+  //   setCurrentHabit(habit);
+  // }
+
+  // const onSubmit = (values: z.infer<typeof formSchema>) => {
+  //   if (currentHabit) {
+  //     updateRecord([{
+  //       habitId: currentHabit.id,
+  //       id: new Date().getTime().toString(),
+  //       amount: values.amount,
+  //       completed: true,
+  //       createdAt: new Date().getTime().toString(),
+  //       updatedAt: new Date().getTime().toString()
+  //     }])
+  //     // updateHabit(currentHabit.id, { completed: true });
+  //     setCompleteDrawerOpen(false);
+  //     router.refresh();
+  //   }
+  // };
+
+  // return (
+  //   <div></div>
+  // )
 
   return (
     <main className="flex min-h-screen flex-col p-6">
@@ -60,12 +96,8 @@ export default function Home() {
         </Button>
       </Link>
       <div className="flex flex-col space-y-2">
-        {habits.map((habit) => (
-          <HabitItem habit={habit} key={habit.id} onCancelComplete={handleCancelComplete} onOpenCompleteDrawer={handleOpenCompleteDrawer} />
-        ))}
+        <TodoList todoList={todayTodo} />
       </div>
-      
-      <CompleteDrawer onSubmit={onSubmit} open={completeDrawerOpen} habit={currentHabit} />
     </main>
   );
 }

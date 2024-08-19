@@ -1,19 +1,18 @@
 "use client";
 
-
-import { Habit } from "@/types/habit";
 import { Unit, Type } from "@/lib/enum";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Square, SquareCheckBig, SquareMinus } from "lucide-react";
+import { Habit } from "@prisma/client";
 
 const HabitItem = ({
   habit,
   onCancelComplete: onCancelComplete,
   onOpenCompleteDrawer: onOpenCompleteDrawer,
 }: {
-  habit: Habit;
+  habit: {habitId: string, completed: boolean, amount: string | number};
   onCancelComplete: (habitId: string) => void;
   onOpenCompleteDrawer: (habit: Habit) => void;
 }) => {
