@@ -80,7 +80,10 @@ const HabitForm = ({ habit }: HabitFormProps) => {
         await axios.patch(`/api/habits/${data.id}`, data);
       } else {
         delete data.id;
-        await axios.post("/api/habits", data);
+        await axios.post("/api/habits", {
+          ...data,
+          userId: 'abf7fcd1-7562-47f4-abff-a5387c765651'
+        });
       }
       toast.success("习惯已保存");
       router.replace("/");

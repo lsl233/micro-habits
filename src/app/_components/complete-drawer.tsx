@@ -22,16 +22,18 @@ import { Habit } from "@/types/habit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Storage } from "@/lib/storage";
+
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { TodayDayTodo } from "@/types";
+import { useEffect } from "react";
 
 export const formSchema = z.object({
   amount:  z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
 });
 
-const CompleteDrawer = ({ habitId, open, onSwitchDrawer }: { habitId: string; open: boolean; onSwitchDrawer: () => void }) => {
+const CompleteDrawer = ({ todo, open, onSwitchDrawer }: { todo?: TodayDayTodo; open: boolean; onSwitchDrawer: () => void }) => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,10 +42,21 @@ const CompleteDrawer = ({ habitId, open, onSwitchDrawer }: { habitId: string; op
     },
   });
 
+  useEffect(() => {
+    if (todo?.amount) {
+      form.setValue("amount", todo.amount);
+    }
+  }, [form, todo]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // TODO: 提交
+    if (!todo) return
     try {
-      await axios.post(`/api/todo`, { amount: values.amount, habitId });
+      await axios.post(`/api/records`, {
+        habitId: todo.habitId,
+        userId: todo.userId,
+        amount: values.amount,
+      });
       onSwitchDrawer();
       router.refresh();
       toast.success("提交成功");

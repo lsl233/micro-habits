@@ -1,90 +1,53 @@
-
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { OneDayTodo } from "@/types";
+import { HabitWithRecords, TodayDayTodo, TodoWithHabit } from "@/types";
 import { TodoList } from "./_components/todo-list";
 import { Todo } from "@prisma/client";
 
 export default async function Home() {
-  const todayTodo: OneDayTodo[] = [];
+  const todayTodo: TodayDayTodo[] = [];
 
-  const habits = await db.habit.findMany({
-    include: {
-      records: true,
+  // const todo: TodoWithHabit[] = await ;
+  const habits: HabitWithRecords[] = await db.habit.findMany({
+    where: {
+      userId: "abf7fcd1-7562-47f4-abff-a5387c765651",
     },
-  });
-
-  for (const habit of habits) {
-    if (habit.cycleTimeType === "0") {
-      if (habit.records.length) {
-        const res = await db.todo.findMany({
-          where: {
-            createdAt: {
-              gte: new Date(new Date().setHours(0, 0, 0, 0)),
-              lt: new Date(new Date().setHours(23, 59, 59, 999)),
-            },
+    include: {
+      records: {
+        where: {
+          createdAt: {
+            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            lt: new Date(new Date().setHours(23, 59, 59, 999)),
           },
-        })
-        todayTodo.concat(res as OneDayTodo[])
-      } else {
-        todayTodo.push({
-          habitId: habit.id,
-          amount: habit.amount,
-          title: `${habit.cycleTimeType} ${habit.action} ${habit.amount} ${habit.unit}`,
-          completed: false,
-        });
-      }
-    }
+        },
+      },
+    },
+  })
+
+  const generateTodayTodo = (habits: HabitWithRecords[]) => {
+    habits.forEach((habit) => {
+      const records = habit.records
+
+      todayTodo.push({
+        id: records.length > 0 ? records[0].id : '',
+        habitId: habit.id,
+        amount: habit.amount,
+        userId: habit.userId,
+        action: habit.action,
+        unit: habit.unit,
+        cycleTimeType: habit.cycleTimeType,
+        completed: records.length > 0,
+      })
+    })
   }
 
-  // 每天执行一次
-  console.log("[Todo]", todayTodo);
+  generateTodayTodo(habits)
 
-  // console.log(habits)
 
-  // const [record, setRecord, updateRecord] = useStorage<Record[]>("record", []);
-  // const [habits, setHabits, updateHabit] = useHabits();
-  // const [completeDrawerOpen, setCompleteDrawerOpen] = useState(false);
-  // const [currentHabit, setCurrentHabit] = useState<Habit | undefined>();
-  // const router = useRouter();
 
-  // const handleChange = (habit: Habit, checked: boolean) => {
-  //   if (checked) {
-  //     setCompleteDrawerOpen(checked);
-  //     setCurrentHabit(habit);
-  //   }
-  // };
-
-  // const handleCancelComplete = (habitId: string) => {
-  //   setRecord(record.filter(r => r.habitId !== habitId));
-  // }
-
-  // const handleOpenCompleteDrawer = (habit: Habit) => {
-  //   setCompleteDrawerOpen(true);
-  //   setCurrentHabit(habit);
-  // }
-
-  // const onSubmit = (values: z.infer<typeof formSchema>) => {
-  //   if (currentHabit) {
-  //     updateRecord([{
-  //       habitId: currentHabit.id,
-  //       id: new Date().getTime().toString(),
-  //       amount: values.amount,
-  //       completed: true,
-  //       createdAt: new Date().getTime().toString(),
-  //       updatedAt: new Date().getTime().toString()
-  //     }])
-  //     // updateHabit(currentHabit.id, { completed: true });
-  //     setCompleteDrawerOpen(false);
-  //     router.refresh();
-  //   }
-  // };
-
-  // return (
-  //   <div></div>
-  // )
+  console.log(habits)
 
   return (
     <main className="flex min-h-screen flex-col p-6">

@@ -1,34 +1,27 @@
 "use client";
 
-import { OneDayTodo } from "@/types";
+import { OneDayTodo, TodayDayTodo, TodoWithHabit } from "@/types";
 import { TodoItem } from "./todo-item";
 import CompleteDrawer from "./complete-drawer";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Todo } from "@prisma/client";
 
-export const TodoList = ({ todoList }: { todoList: OneDayTodo[] }) => {
+export const TodoList = ({ todoList }: { todoList: TodayDayTodo[] }) => {
   const router = useRouter();
   const [completeDrawerOpen, setCompleteDrawerOpen] = useState(false);
-  const [activeHabitId, setActiveHabitId] = useState<string>("");
+  const [activeTodo, setActiveTodo] = useState<TodayDayTodo>();
 
   const handleSwitchDrawer = () => {
     setCompleteDrawerOpen(!completeDrawerOpen);
   };
 
-  const handleClickButton = async (
-    habitId: string,
-    completed: boolean,
-    todoId?: string
-  ) => {
-    setActiveHabitId(habitId);
-    if (completed) {
-      if (todoId) {
-        await axios.patch(`/api/todo/${todoId}`, {
-          completed: true,
-        });
-        router.refresh();
-      }
+  const handleClickButton = async (todo: TodayDayTodo) => {
+    setActiveTodo(todo);
+    if (todo.completed) {
+      await axios.delete(`/api/records/${todo.id}`);
+      router.refresh();
     } else {
       handleSwitchDrawer();
     }
@@ -37,10 +30,10 @@ export const TodoList = ({ todoList }: { todoList: OneDayTodo[] }) => {
   return (
     <>
       {todoList.map((item, index) => (
-        <TodoItem key={index} {...item} onClickButton={handleClickButton} />
+        <TodoItem key={index} todo={item} onClickButton={handleClickButton} />
       ))}
       <CompleteDrawer
-        habitId={activeHabitId}
+        todo={activeTodo}
         open={completeDrawerOpen}
         onSwitchDrawer={handleSwitchDrawer}
       />

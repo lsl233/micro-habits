@@ -1,26 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { OneDayTodo } from "@/types";
+import { TodayDayTodo, TodoWithHabit } from "@/types";
+import { Todo } from "@prisma/client";
 import { Square, SquareCheckBig } from "lucide-react";
 import Link from "next/link";
 
-interface Props extends OneDayTodo {
-  onClickButton: (habitId: string, completed: boolean, todoId?: string) => void;
-}
-
-export const TodoItem = (props: Props) => {
+export const TodoItem = ({todo, onClickButton}: {todo: TodayDayTodo, onClickButton: (todo: TodayDayTodo) => void}) => {
   return (
     <div className="flex justify-between items-center border rounded-md py-2 px-3">
-      <Link href={`/habits/${props.habitId}`}>
-        <h2 className="text-md">{props.title}</h2>
+      <Link href={`/habits/${todo.habitId}`}>
+        <h2 className="text-md">{`${todo.cycleTimeType}${todo.action} ${todo.amount} ${todo.unit}`}</h2>
       </Link>
 
       <Button
-        onClick={() => props.onClickButton(props.habitId, props.completed, props.id)}
+        onClick={() => onClickButton(todo)}
         variant="link"
         size="icon"
         className="h-auto"
       >
-        {props.completed ? <SquareCheckBig /> : <Square className="text-gray-500" />}
+        {todo.completed ? <SquareCheckBig /> : <Square className="text-gray-500" />}
       </Button>
     </div>
   );

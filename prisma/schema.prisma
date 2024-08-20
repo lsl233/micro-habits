@@ -14,26 +14,50 @@ datasource db {
   relationMode = "prisma"
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Habit {
   id            String   @id @default(uuid())
+  userId        String
   action        String
   amount        Int
   unit          String
   cycleTimeType String
   done          Boolean  @default(false)
-  records       Todo[]
+  todo          Todo[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  records       Record[]
 }
 
 model Todo {
   id        String   @id @default(uuid())
+  userId    String
   habitId   String
   amount    Int
-  completed Boolean @default(false)
+  completed Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Habit Habit @relation(fields: [habitId], references: [id])
+  habit Habit @relation(fields: [habitId], references: [id])
+
+  @@index([habitId])
+}
+
+model Record {
+  id        String   @id @default(uuid())
+  userId    String
+  habitId   String
+  amount    Int
+  habit     Habit    @relation(fields: [habitId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([habitId])
 }

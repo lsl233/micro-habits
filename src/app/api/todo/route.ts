@@ -8,7 +8,12 @@ export const POST = async (req: Request) => {
   try {
     const createdTodo = await db.todo.create({
       data: {
-        habitId: body.habitId,
+        userId: body.userId, // Add userId field
+        habit: {
+          connect: {
+            id: body.habitId
+          }
+        },
         amount: body.amount,
         completed: true,
       },
