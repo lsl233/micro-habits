@@ -1,9 +1,9 @@
-import { Type, Unit } from "@/lib/enum";
+import { CycleTimeType, Unit } from "@/lib/enum";
 
 export interface Habit {
     id: string;
     title: string;
-    type: Type | undefined;
+    type: CycleTimeType | undefined;
     amount: number | string;
     unit: Unit | undefined
     completed: boolean;
