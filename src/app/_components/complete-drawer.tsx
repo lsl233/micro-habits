@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/wrap/button";
 import {
   Drawer,
   DrawerClose,
@@ -27,13 +27,13 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { TodayDayTodo } from "@/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const formSchema = z.object({
   amount:  z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
 });
 
-const CompleteDrawer = ({ todo, open, onSwitchDrawer }: { todo?: TodayDayTodo; open: boolean; onSwitchDrawer: () => void }) => {
+const CompleteDrawer = ({ todo, open, onSwitchDrawer, deleting }: { todo?: TodayDayTodo; open: boolean; onSwitchDrawer: () => void; deleting: boolean }) => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,6 +42,8 @@ const CompleteDrawer = ({ todo, open, onSwitchDrawer }: { todo?: TodayDayTodo; o
     },
   });
 
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
     if (todo?.amount) {
       form.setValue("amount", todo.amount);
@@ -49,9 +51,9 @@ const CompleteDrawer = ({ todo, open, onSwitchDrawer }: { todo?: TodayDayTodo; o
   }, [form, todo]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // TODO: 提交
     if (!todo) return
     try {
+      setLoading(true)
       await axios.post(`/api/records`, {
         habitId: todo.habitId,
         userId: todo.userId,
@@ -63,6 +65,8 @@ const CompleteDrawer = ({ todo, open, onSwitchDrawer }: { todo?: TodayDayTodo; o
     } catch (error) {
       console.log(error);
       toast.error("提交失败");
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -101,7 +105,7 @@ const CompleteDrawer = ({ todo, open, onSwitchDrawer }: { todo?: TodayDayTodo; o
             </div>
 
             <DrawerFooter className="flex justify-center flex-row">
-              <Button type="submit">提交</Button>
+              <Button type="submit" loading={loading}>提交</Button>
               <Button onClick={onSwitchDrawer} variant="outline">取消</Button>
             </DrawerFooter>
           </form>

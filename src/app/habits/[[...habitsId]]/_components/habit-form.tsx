@@ -5,11 +5,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/wrap/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,16 +21,14 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Storage, useHabits } from "@/lib/storage";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
-import { Unit, Type } from "@/lib/enum";
+import { Unit, CycleTimeType } from "@/lib/enum";
 import { enumKeys } from "@/lib/utils";
 import { Habit } from "@prisma/client";
+import { useState } from "react";
 
 const FormSchema = z.object({
   id: z.string().or(z.undefined()),
@@ -53,7 +50,7 @@ interface HabitFormProps {
 const defaultValues = {
   id: "",
   action: "",
-  cycleTimeType: "",
+  cycleTimeType: "0",
   unit: "",
   amount: "",
   done: false,
@@ -63,9 +60,10 @@ const defaultValues = {
 
 const HabitForm = ({ habit }: HabitFormProps) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const units = enumKeys(Unit);
-  const types = enumKeys(Type);
+  const types = enumKeys(CycleTimeType);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -76,19 +74,22 @@ const HabitForm = ({ habit }: HabitFormProps) => {
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     try {
+      setLoading(true);
       if (data.id) {
         await axios.patch(`/api/habits/${data.id}`, data);
       } else {
         delete data.id;
         await axios.post("/api/habits", {
           ...data,
-          userId: 'abf7fcd1-7562-47f4-abff-a5387c765651'
+          userId: "abf7fcd1-7562-47f4-abff-a5387c765651",
         });
       }
-      toast.success("习惯已保存");
       router.replace("/");
+      toast.success("习惯已保存");
     } catch (e) {
       console.error(e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,7 +127,6 @@ const HabitForm = ({ habit }: HabitFormProps) => {
                       type="number"
                       placeholder="e.g.1"
                       {...field}
-                      className="text-center"
                     />
                   </FormControl>
                   <FormMessage />
@@ -183,6 +183,7 @@ const HabitForm = ({ habit }: HabitFormProps) => {
                   <FormLabel>时间类型</FormLabel>
                   <FormControl>
                     <Select
+                      disabled={true}
                       onValueChange={field.onChange}
                       defaultValue={String(field.value)}
                     >
@@ -197,8 +198,8 @@ const HabitForm = ({ habit }: HabitFormProps) => {
                         <SelectGroup>
                           {types.map((type) => (
                             <SelectItem
-                              value={String(Type[type])}
-                              key={Type[type]}
+                              value={String(CycleTimeType[type])}
+                              key={CycleTimeType[type]}
                             >
                               {type}
                             </SelectItem>
@@ -214,12 +215,12 @@ const HabitForm = ({ habit }: HabitFormProps) => {
           />
         </div>
         <p className="mt-4">
-          {fields.cycleTimeType !== "" && Type[Number(fields.cycleTimeType)]}
+          {fields.cycleTimeType !== "" && CycleTimeType[Number(fields.cycleTimeType)]}
           {fields.action} {fields.amount}{" "}
           {fields.unit !== "" && Unit[Number(fields.unit)]}
         </p>
-        <Button type="submit" className="mt-4">
-          创 建
+        <Button loading={loading} type="submit" className="mt-4">
+          提 交
         </Button>
       </form>
     </Form>

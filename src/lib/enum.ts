@@ -9,7 +9,7 @@ export enum Unit {
   "小时",
 }
 
-export enum Type {
+export enum CycleTimeType {
   "每天",
   "每周",
   "每月",
