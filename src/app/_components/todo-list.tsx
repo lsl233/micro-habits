@@ -1,12 +1,11 @@
 "use client";
 
-import { OneDayTodo, TodayDayTodo, TodoWithHabit } from "@/types";
+import { TodayDayTodo } from "@/types";
 import { TodoItem } from "./todo-item";
 import CompleteDrawer from "./complete-drawer";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Todo } from "@prisma/client";
 import toast from "react-hot-toast";
 
 export const TodoList = ({ todoList }: { todoList: TodayDayTodo[] }) => {
@@ -15,27 +14,8 @@ export const TodoList = ({ todoList }: { todoList: TodayDayTodo[] }) => {
   const [activeTodo, setActiveTodo] = useState<TodayDayTodo>();
   const [deleting, setDeleting] = useState(false);
 
-  const handleSwitchDrawer = () => {
+  const switchDrawer = () => {
     setCompleteDrawerOpen(!completeDrawerOpen);
-  };
-
-  const handleClickButton = async (todo: TodayDayTodo) => {
-    setActiveTodo(todo);
-    if (todo.completed) {
-      if (deleting) return
-      
-      setDeleting(true);
-      try {
-        await axios.delete(`/api/records/${todo.id}`);
-        router.refresh();
-      } catch (error) {
-        toast.error("服务器异常");
-      } finally {
-        setDeleting(false);
-      }
-    } else {
-      handleSwitchDrawer();
-    }
   };
 
   return (
@@ -44,14 +24,14 @@ export const TodoList = ({ todoList }: { todoList: TodayDayTodo[] }) => {
         <TodoItem
           key={index}
           todo={item}
-          onClickButton={handleClickButton}
-          deleting={deleting}
+          onClickTitle={setActiveTodo}
+          switchDrawer={switchDrawer}
         />
       ))}
       <CompleteDrawer
         todo={activeTodo}
         open={completeDrawerOpen}
-        onSwitchDrawer={handleSwitchDrawer}
+        switchDrawer={switchDrawer}
       />
     </>
   );

@@ -37,6 +37,7 @@ export default async function Home() {
         userId: habit.userId,
         action: habit.action,
         unit: habit.unit,
+        loading: false,
         cycleTimeType: habit.cycleTimeType,
         completed: records.length > 0,
       })

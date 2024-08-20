@@ -5,6 +5,7 @@ export interface TodayDayTodo
   extends Omit<Habit, "id" | "createdAt" | "updatedAt" | "done"> {
     habitId: string;
     completed: boolean;
+    loading: boolean;
     id?: string;
 }
 

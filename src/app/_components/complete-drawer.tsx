@@ -33,7 +33,7 @@ export const formSchema = z.object({
   amount:  z.coerce.number().min(1, { message: "最少输入1" }).or(z.string()),
 });
 
-const CompleteDrawer = ({ todo, open, onSwitchDrawer, deleting }: { todo?: TodayDayTodo; open: boolean; onSwitchDrawer: () => void; deleting: boolean }) => {
+const CompleteDrawer = ({ todo, open, switchDrawer }: { todo?: TodayDayTodo; open: boolean; switchDrawer: () => void }) => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,7 +59,7 @@ const CompleteDrawer = ({ todo, open, onSwitchDrawer, deleting }: { todo?: Today
         userId: todo.userId,
         amount: values.amount,
       });
-      onSwitchDrawer();
+      switchDrawer();
       router.refresh();
       toast.success("提交成功");
     } catch (error) {
@@ -106,7 +106,7 @@ const CompleteDrawer = ({ todo, open, onSwitchDrawer, deleting }: { todo?: Today
 
             <DrawerFooter className="flex justify-center flex-row">
               <Button type="submit" loading={loading}>提交</Button>
-              <Button onClick={onSwitchDrawer} variant="outline">取消</Button>
+              <Button onClick={switchDrawer} variant="outline">取消</Button>
             </DrawerFooter>
           </form>
         </Form>
