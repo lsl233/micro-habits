@@ -4,9 +4,7 @@ import { TodayDayTodo } from "@/types";
 import { TodoItem } from "./todo-item";
 import CompleteDrawer from "./complete-drawer";
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 
 export const TodoList = ({ todoList }: { todoList: TodayDayTodo[] }) => {
   const router = useRouter();

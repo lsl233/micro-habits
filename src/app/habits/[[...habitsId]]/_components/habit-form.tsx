@@ -61,7 +61,7 @@ const defaultValues = {
 const HabitForm = ({ habit }: HabitFormProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
+  const [deleting, setDeleting] = useState(false);
   const units = enumKeys(Unit);
   const types = enumKeys(CycleTimeType);
 
@@ -85,11 +85,25 @@ const HabitForm = ({ habit }: HabitFormProps) => {
         });
       }
       router.replace("/");
+      router.refresh();
       toast.success("习惯已保存");
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setDeleting(true);
+      await axios.delete(`/api/habits/${habit?.id}`);
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -123,11 +137,7 @@ const HabitForm = ({ habit }: HabitFormProps) => {
                 <FormItem className="md:w-1/4 w-full">
                   <FormLabel>数量</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="e.g.1"
-                      {...field}
-                    />
+                    <Input type="number" placeholder="e.g.1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -215,12 +225,16 @@ const HabitForm = ({ habit }: HabitFormProps) => {
           />
         </div>
         <p className="mt-4">
-          {fields.cycleTimeType !== "" && CycleTimeType[Number(fields.cycleTimeType)]}
+          {fields.cycleTimeType !== "" &&
+            CycleTimeType[Number(fields.cycleTimeType)]}
           {fields.action} {fields.amount}{" "}
           {fields.unit !== "" && Unit[Number(fields.unit)]}
         </p>
         <Button loading={loading} type="submit" className="mt-4">
           提 交
+        </Button>
+        <Button loading={deleting} variant="destructive" onClick={handleDelete} className="mt-2">
+          删 除
         </Button>
       </form>
     </Form>

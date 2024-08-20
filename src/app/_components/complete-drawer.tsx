@@ -106,7 +106,7 @@ const CompleteDrawer = ({ todo, open, switchDrawer }: { todo?: TodayDayTodo; ope
 
             <DrawerFooter className="flex justify-center flex-row">
               <Button type="submit" loading={loading}>提交</Button>
-              <Button onClick={switchDrawer} variant="outline">取消</Button>
+              <Button onClick={switchDrawer} variant="outline" type="button">取消</Button>
             </DrawerFooter>
           </form>
         </Form>

@@ -1,25 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { CycleTimeType, Unit } from "@/lib/enum";
-import { TodayDayTodo, TodoWithHabit } from "@/types";
-import { Todo } from "@prisma/client";
+import { TodayDayTodo } from "@/types";
 import axios from "axios";
 import { LoaderCircle, Square, SquareCheckBig } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export const TodoItem = ({todo, onClickTitle, switchDrawer}: {todo: TodayDayTodo, onClickTitle: (todo: TodayDayTodo) => void, switchDrawer: () => void}) => {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
+  const [completed, setCompleted] = useState(todo.completed);
+
+  useEffect(() => {
+    setCompleted(todo.completed);
+  }, [todo]);
 
   const handleClickButton = async () => {
     onClickTitle(todo)
-    if (todo.completed) {
+    if (completed) {
       setLoading(true);
       try {
         await axios.delete(`/api/records/${todo.id}`);
-        router.refresh();
+        // router.refresh();
+        setCompleted(false);
       } catch (error) {
         toast.error("服务器异常");
       } finally {
@@ -43,7 +47,7 @@ export const TodoItem = ({todo, onClickTitle, switchDrawer}: {todo: TodayDayTodo
       >
         {
           loading ? <LoaderCircle className="animate-spin" /> :
-          todo.completed ? <SquareCheckBig /> : <Square className="text-gray-500" />
+          completed ? <SquareCheckBig /> : <Square className="text-gray-500" />
         }
       </Button>
     </div>

@@ -13,3 +13,12 @@ export async function POST(req: Request) {
     return serverResponseError(error, req);
   }
 }
+
+export async function GET(req: Request) {
+  try { 
+    const records = await db.record.findMany();
+    return NextResponse.json(records);
+  } catch (error) {
+    return serverResponseError(error, req);
+  }
+}

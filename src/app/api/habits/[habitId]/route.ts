@@ -18,3 +18,22 @@ export const PATCH = async (req: Request, { params }: { params: { habitId: strin
         serverResponseError(error, req);
     }
 }
+
+export const DELETE = async (req: Request, { params }: { params: { habitId: string } }) => {
+    try {
+        const { habitId } = params;
+        await db.record.deleteMany({
+            where: {
+                habitId
+            }
+        })
+        await db.habit.delete({
+            where: {
+                id: habitId
+            }
+        })
+        return NextResponse.json(true);
+    } catch (error) {
+        serverResponseError(error, req);
+    }
+}
