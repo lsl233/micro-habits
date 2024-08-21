@@ -85,7 +85,6 @@ const HabitForm = ({ habit }: HabitFormProps) => {
         });
       }
       router.replace("/");
-      router.refresh();
       toast.success("习惯已保存");
     } catch (e) {
       console.error(e);
@@ -233,9 +232,16 @@ const HabitForm = ({ habit }: HabitFormProps) => {
         <Button loading={loading} type="submit" className="mt-4">
           提 交
         </Button>
-        <Button loading={deleting} variant="destructive" onClick={handleDelete} className="mt-2">
-          删 除
-        </Button>
+        {habit?.id && (
+          <Button
+            loading={deleting}
+            variant="destructive"
+            onClick={handleDelete}
+            className="mt-2"
+          >
+            删 除
+          </Button>
+        )}
       </form>
     </Form>
   );
