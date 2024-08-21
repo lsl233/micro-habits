@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import HabitForm from "./_components/habit-form";
 import { Habit } from "@prisma/client";
-import toast from "react-hot-toast";
 
 const HabitsIdPage = async ({ params }: { params: { habitsId: string } }) => {
   const habitsId = params?.habitsId?.[0];
