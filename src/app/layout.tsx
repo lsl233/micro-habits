@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "微习惯",
   description: "先有一个习惯",
-  viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+  viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 };
 
 export default function RootLayout({
