@@ -230,19 +230,21 @@ const HabitForm = ({ habit }: HabitFormProps) => {
           {fields.action} {fields.amount}{" "}
           {fields.unit !== "" && Unit[Number(fields.unit)]}
         </p>
-        <Button loading={loading} type="submit" className="mt-4">
-          提 交
-        </Button>
-        {habit?.id && (
-          <Button
-            loading={deleting}
-            variant="destructive"
-            onClick={handleDelete}
-            className="mt-2"
-          >
-            删 除
+        <div className="mt-6 flex md:space-x-4 space-x-0 space-y-4 md:space-y-0 flex-col md:flex-row justify-center">
+          <Button loading={loading} type="submit" className="md:w-60 w-full">
+            提 交
           </Button>
-        )}
+          {habit?.id && (
+            <Button
+              className="md:w-60 w-full"
+              loading={deleting}
+              variant="destructive"
+              onClick={handleDelete}
+            >
+              删 除
+            </Button>
+          )}
+        </div>
       </form>
     </Form>
   );
