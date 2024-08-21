@@ -85,6 +85,7 @@ const HabitForm = ({ habit }: HabitFormProps) => {
         });
       }
       router.replace("/");
+      router.refresh();
       toast.success("习惯已保存");
     } catch (e) {
       console.error(e);
