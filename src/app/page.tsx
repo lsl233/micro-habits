@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { CalendarPlus, Plus } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { HabitWithRecords, TodayDayTodo, TodoWithHabit } from "@/types";
 import { TodoList } from "./_components/todo-list";
-import { Todo } from "@prisma/client";
 
-export const dynamic = 'force-dynamic'
+// export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const todayTodo: TodayDayTodo[] = [];
@@ -26,14 +25,14 @@ export default async function Home() {
         },
       },
     },
-  })
+  });
 
   const generateTodayTodo = (habits: HabitWithRecords[]) => {
     habits.forEach((habit) => {
-      const records = habit.records
+      const records = habit.records;
 
       todayTodo.push({
-        id: records.length > 0 ? records[0].id : '',
+        id: records.length > 0 ? records[0].id : "",
         habitId: habit.id,
         amount: habit.amount,
         userId: habit.userId,
@@ -42,28 +41,25 @@ export default async function Home() {
         loading: false,
         cycleTimeType: habit.cycleTimeType,
         completed: records.length > 0,
-      })
-    })
-  }
+      });
+    });
+  };
 
-  generateTodayTodo(habits)
+  generateTodayTodo(habits);
 
-
-
-  console.log(habits)
+  console.log(habits);
 
   return (
-    <main className="flex min-h-screen flex-col p-6">
-      <h1 className="text-4xl border-b pb-4 mb-4">微习惯</h1>
-      <Link href="/habits">
+    <>
+      <Link className="inline-flex justify-start" href="/habits">
         <Button className="w-28 mb-4">
-          <Plus />
+          <CalendarPlus className="w-4 h-4 mr-2" />
           New
         </Button>
       </Link>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2 w-full">
         <TodoList todoList={todayTodo} />
       </div>
-    </main>
+    </>
   );
 }

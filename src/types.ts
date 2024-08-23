@@ -16,3 +16,7 @@ export type TodoWithHabit = Prisma.TodoGetPayload<{
 export type HabitWithRecords = Prisma.HabitGetPayload<{
   include: { records: true };
 }>;
+
+export type RecordWithHabit = Prisma.RecordGetPayload<{
+  include: { habit: true };
+}>;

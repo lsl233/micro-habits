@@ -111,7 +111,7 @@ const HabitForm = ({ habit }: HabitFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid items-center flex-col w-full p-6"
+        className="grid items-center flex-col w-full"
       >
         <div className="md:flex md:space-x-4 space-y-2 md:space-y-0">
           <FormField
