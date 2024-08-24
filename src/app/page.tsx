@@ -47,7 +47,6 @@ export default async function Home() {
 
   generateTodayTodo(habits);
 
-  console.log(habits);
 
   return (
     <>

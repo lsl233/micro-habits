@@ -65,7 +65,6 @@ const Chart = ({ records }: { records: RecordWithHabit[] }) => {
   const generateDataset = () => {
     const dataMap: {[key: string]: RecordWithHabit[]} = {}
     for (const record of records) {
-      console.log(record);
       const todo = record.habit
       const title = `${CycleTimeType[Number(todo.cycleTimeType)]}${todo.action} ${todo.amount} ${Unit[Number(todo.unit)]}`
       if (dataMap.title) {
@@ -77,7 +76,6 @@ const Chart = ({ records }: { records: RecordWithHabit[] }) => {
   };
 
   useEffect(() => {
-    console.log(records);
 
     const result = {};
 

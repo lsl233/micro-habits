@@ -63,7 +63,7 @@ const CompleteDrawer = ({ todo, open, switchDrawer }: { todo?: TodayDayTodo; ope
       router.refresh();
       toast.success("提交成功");
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("提交失败");
     } finally {
       setLoading(false)
