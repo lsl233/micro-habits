@@ -1,108 +1,111 @@
-"use client";
+"use client"
 
-import dayjs from "dayjs";
-import * as echarts from "echarts/core";
-import { BarChart, LineChart } from "echarts/charts";
+import { TrendingUp } from "lucide-react"
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
+
 import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  // 数据集组件
-  DatasetComponent,
-  // 内置数据转换器组件 (filter, sort)
-  TransformComponent,
-} from "echarts/components";
-import { LabelLayout, UniversalTransition } from "echarts/features";
-import { CanvasRenderer } from "echarts/renderers";
-import type {
-  // 系列类型的定义后缀都为 SeriesOption
-  BarSeriesOption,
-  LineSeriesOption,
-} from "echarts/charts";
-import type {
-  // 组件类型的定义后缀都为 ComponentOption
-  TitleComponentOption,
-  TooltipComponentOption,
-  GridComponentOption,
-  DatasetComponentOption,
-} from "echarts/components";
-import type { ComposeOption } from "echarts/core";
-import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import dayjs from "dayjs"
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
+import { RecordWithHabit } from "@/types"
+const chartData = [
+  { month: "January", desktop: 186, mobile: 80 },
+  { month: "February", desktop: 305, mobile: 200 },
+  { month: "March", desktop: 237, mobile: 120 },
+  { month: "April", desktop: 73, mobile: 190 },
+  { month: "May", desktop: 209, mobile: 130 },
+  { month: "June", desktop: 214, mobile: 140 },
+]
 
-// 通过 ComposeOption 来组合出一个只有必须组件和图表的 Option 类型
-type ECOption = ComposeOption<
-  | BarSeriesOption
-  | LineSeriesOption
-  | TitleComponentOption
-  | TooltipComponentOption
-  | GridComponentOption
-  | DatasetComponentOption
->;
-
-// 注册必须的组件
-echarts.use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent,
-  BarChart,
-  LineChart,
-  LabelLayout,
-  UniversalTransition,
-  CanvasRenderer,
-]);
-
-import { RecordWithHabit } from "@/types";
-import { CycleTimeType, Unit } from "@/lib/enum";
-
+const chartConfig = {
+  amount: {
+    label: "完成数量",
+    color: "hsl(var(--chart-1))",
+  },
+  label: {
+    color: "hsl(var(--background))",
+  },
+} satisfies ChartConfig
 
 const Chart = ({ records }: { records: RecordWithHabit[] }) => {
-  const chartRef = useRef(null);
+  const chartData = records.map((record) => ({
+    date: dayjs(record.createdAt).format("YYYY-MM-DD"),
+    amount: record.amount,
+  }))
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Bar Chart - Custom Label</CardTitle>
+        <CardDescription>January - June 2024</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            layout="vertical"
+            margin={{
+              right: 16,
+            }}
+          >
+            <CartesianGrid horizontal={false} />
+            <YAxis
+              dataKey="date"
+              type="category"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              hide
+            />
+            <XAxis dataKey="amount" type="number" hide />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="line" />}
+            />
+            <Bar
+              dataKey="amount"
+              layout="vertical"
+              fill="var(--color-amount)"
+              radius={4}
+              maxBarSize={30}
+            >
+              <LabelList
+                dataKey="date"
+                position="insideLeft"
+                className="fill-[--color-label]"
+                fontSize={12}
+              />
+              <LabelList
+                dataKey="amount"
+                position="insideRight"
+                className="fill-[--color-label]"
+                fontSize={12}
+              />
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 font-medium leading-none">
+          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="leading-none text-muted-foreground">
+          Showing total visitors for the last 6 months
+        </div>
+      </CardFooter>
+    </Card>
+  )
+}
 
-  const generateDataset = () => {
-    const dataMap: {[key: string]: RecordWithHabit[]} = {}
-    for (const record of records) {
-      const todo = record.habit
-      const title = `${CycleTimeType[Number(todo.cycleTimeType)]}${todo.action} ${todo.amount} ${Unit[Number(todo.unit)]}`
-      if (dataMap.title) {
-        dataMap[title].push(record)
-      } else {
-        dataMap[title] = [record]
-      }
-    }
-  };
-
-  useEffect(() => {
-
-    const result = {};
-
-    const dataset = records.map((record) => {
-      return {
-        type: "bar",
-        name: dayjs(record.createdAt).format("YYYY-MM-DD"),
-        value: record.amount,
-      };
-    });
-    const option: ECOption = {
-      xAxis: {
-        type: "time",
-      },
-      yAxis: {
-        type: "value",
-      },
-      series: [
-        {
-          type: "bar",
-          data: [10, 20, 30, 40, 50, 60, 70],
-        },
-      ],
-    };
-    echarts.init(chartRef.current).setOption(option);
-  }, []);
-
-  return <div ref={chartRef} className="w-full h-[300px]"></div>;
-};
-
-export default Chart;
+export default Chart
