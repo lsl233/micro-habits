@@ -40,19 +40,9 @@ const SignInPage = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
     await fetch("/api/auth/sign-in", { method: "POST", body: JSON.stringify(data) });
     router.replace("/");
   };
-
-  // const handleSignIn = async (formData: any) => {
-  //   "use server";
-  //   await signIn("credentials", {
-  //     email: formData.get("email"),
-  //     password: formData.get("password"),
-  //     redirectTo: "/",
-  //   });
-  // };
 
   return (
     <>
