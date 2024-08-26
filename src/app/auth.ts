@@ -24,10 +24,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Credentials({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
       // e.g. domain, username, password, 2FA token, etc.
+      // http://localhost:3000/api/auth/signin
       credentials: {
         email: {},
         password: {},
       },
+      
       authorize: async (credentials) => {
         try {
           let user = null;
@@ -40,7 +42,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .createHash("sha256")
             .update(password)
             .digest("hex");
-
 
           // logic to verify if the user exists
           user = await db.user.findFirst({
@@ -57,7 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // return JSON object with the user data
           return user;
         } catch (error) {
-            console.error('[error]', error)
+          console.error("[error]", error);
           if (error instanceof ZodError) {
             // Return `null` to indicate that the credentials are invalid
             return null;
@@ -67,4 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  pages: {
+    signIn: "/auth/sign-in",
+  },
 });

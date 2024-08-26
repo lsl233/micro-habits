@@ -54,7 +54,6 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-import { Record } from "@prisma/client";
 import { RecordWithHabit } from "@/types";
 import { CycleTimeType, Unit } from "@/lib/enum";
 

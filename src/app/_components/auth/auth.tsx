@@ -6,7 +6,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 const Auth = async () => {
@@ -40,8 +39,7 @@ const Auth = async () => {
       </Popover>
     )
   }
-  console.log(111)
-  return <Link href="/auth/sign-in">登 录</Link>
+  return <div><Link href="/auth/sign-in"><Button>登 录</Button></Link> <Link href="/auth/sign-up"><Button variant="outline">注 册</Button></Link></div>
 };
 
 export default Auth;

@@ -4,12 +4,18 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { HabitWithRecords, TodayDayTodo, TodoWithHabit } from "@/types";
 import { TodoList } from "./_components/todo-list";
+import { auth } from "./auth";
+import { redirect } from "next/navigation";
 
 // export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const todayTodo: TodayDayTodo[] = [];
-
+  const session = await auth();
+  const user = session?.user;
+  if (!user) {
+    redirect("/auth/sign-in");
+  }
   // const todo: TodoWithHabit[] = await ;
   const habits: HabitWithRecords[] = await db.habit.findMany({
     where: {
