@@ -94,7 +94,7 @@ const Chart = ({
             onChange={handleSelectChange}
           />
         </CardTitle>
-        {/* <CardDescription>January - June 2024</CardDescription> */}
+        <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <ChartContainer config={chartConfig}>

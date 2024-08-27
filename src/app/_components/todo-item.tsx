@@ -4,12 +4,21 @@ import { TodayDayTodo } from "@/types";
 import axios from "axios";
 import { LoaderCircle, Square, SquareCheckBig } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export const TodoItem = ({todo, onClickTitle, switchDrawer}: {todo: TodayDayTodo, onClickTitle: (todo: TodayDayTodo) => void, switchDrawer: () => void}) => {
+export const TodoItem = ({
+  todo,
+  onClickTitle,
+  switchDrawer,
+}: {
+  todo: TodayDayTodo;
+  onClickTitle: (todo: TodayDayTodo) => void;
+  switchDrawer: () => void;
+}) => {
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const [completed, setCompleted] = useState(todo.completed);
 
   useEffect(() => {
@@ -17,12 +26,12 @@ export const TodoItem = ({todo, onClickTitle, switchDrawer}: {todo: TodayDayTodo
   }, [todo]);
 
   const handleClickButton = async () => {
-    onClickTitle(todo)
+    onClickTitle(todo);
     if (completed) {
       setLoading(true);
       try {
         await axios.delete(`/api/records/${todo.id}`);
-        // router.refresh();
+        router.refresh();
         setCompleted(false);
       } catch (error) {
         toast.error("服务器异常");
@@ -36,7 +45,9 @@ export const TodoItem = ({todo, onClickTitle, switchDrawer}: {todo: TodayDayTodo
   return (
     <div className="flex justify-between items-center border rounded-md py-2 px-3">
       <Link href={`/habits/${todo.habitId}`}>
-        <h2 className="text-md">{`${CycleTimeType[Number(todo.cycleTimeType)]}${todo.action} ${todo.amount} ${Unit[Number(todo.unit)]}`}</h2>
+        <h2 className="text-md">{`${CycleTimeType[Number(todo.cycleTimeType)]}${
+          todo.action
+        } ${todo.amount} ${Unit[Number(todo.unit)]}`}</h2>
       </Link>
 
       <Button
@@ -45,10 +56,13 @@ export const TodoItem = ({todo, onClickTitle, switchDrawer}: {todo: TodayDayTodo
         size="icon"
         className="h-auto"
       >
-        {
-          loading ? <LoaderCircle className="animate-spin" /> :
-          completed ? <SquareCheckBig /> : <Square className="text-gray-500" />
-        }
+        {loading ? (
+          <LoaderCircle className="animate-spin" />
+        ) : completed ? (
+          <SquareCheckBig />
+        ) : (
+          <Square className="text-gray-500" />
+        )}
       </Button>
     </div>
   );

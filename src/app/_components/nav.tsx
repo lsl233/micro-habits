@@ -29,10 +29,6 @@ export const Nav = () => {
     setIsNavHref(Boolean(naves.find((item) => item.href === pathname)));
   }, [pathname]);
 
-  useEffect(() => {
-    router.refresh();
-  }, [pathname, router]);
-
   return (
     isNavHref && (
       <nav className="inline-flex mb-4 h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
