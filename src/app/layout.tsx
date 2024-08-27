@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="flex min-h-screen flex-col items-start p-6">
+        <main className="flex min-h-screen flex-col items-start p-4">
           <header className="flex justify-between items-center w-full mb-6">
             <Link href="/">
               <h1 className="text-4xl">微习惯</h1>

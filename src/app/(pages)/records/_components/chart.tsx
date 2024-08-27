@@ -43,12 +43,12 @@ const Chart = ({ records }: { records: RecordWithHabit[] }) => {
     amount: record.amount,
   }))
   return (
-    <Card className="w-full">
+    <div className="w-full">
       <CardHeader>
         <CardTitle>Bar Chart - Custom Label</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <ChartContainer config={chartConfig}>
           <BarChart
             accessibilityLayer
@@ -103,7 +103,7 @@ const Chart = ({ records }: { records: RecordWithHabit[] }) => {
           Showing total visitors for the last 6 months
         </div>
       </CardFooter>
-    </Card>
+    </div>
   )
 }
 
