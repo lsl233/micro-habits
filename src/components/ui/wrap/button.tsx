@@ -7,7 +7,6 @@ interface WrapButtonProps extends ButtonProps {
 }
 
 export const Button = (props: WrapButtonProps) => {
-  console.log(props.loading, 'loading');
   const {loading, disabled, ...restProps} = props;
   return (
     <ShadcnButton {...restProps} disabled={loading || disabled}>

@@ -10,6 +10,7 @@ export const POST = async (req: Request) => {
             password: data.password,
             redirect: false,
         });
+        console.log(signInResponse, 'signInResponse');
         return NextResponse.json(signInResponse);
     } catch (error) {
         return serverResponseError(error, req);
