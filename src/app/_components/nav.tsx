@@ -12,7 +12,7 @@ const naves = [
   },
   {
     href: "/log",
-    label: "Log"
+    label: "Log",
   },
   {
     href: "/records",
@@ -23,23 +23,33 @@ const naves = [
 export const Nav = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const [isNavHref, setIsNavHref] = useState(false)
+  const [isNavHref, setIsNavHref] = useState(false);
 
   useEffect(() => {
-    setIsNavHref(Boolean(naves.find(item => item.href === pathname)))
-  }, [pathname])
+    setIsNavHref(Boolean(naves.find((item) => item.href === pathname)));
+  }, [pathname]);
 
   useEffect(() => {
-    router.refresh()
-  }, [pathname, router])
+    router.refresh();
+  }, [pathname, router]);
 
-  return isNavHref && (
-    <nav className="inline-flex p-1 border border-gray-200 rounded-md mb-4">
-      {naves.map((nav) => (
-        <Link className={cn("rounded px-2 py-1", nav.href === pathname && "bg-gray-100")} key={nav.href} href={nav.href} prefetch={false}>
-          {nav.label}
-        </Link>
-      ))}
-    </nav>
+  return (
+    isNavHref && (
+      <nav className="inline-flex mb-4 h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+        {naves.map((nav) => (
+          <Link
+            className={cn(
+              "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ",
+              nav.href === pathname && "bg-background text-foreground shadow"
+            )}
+            key={nav.href}
+            href={nav.href}
+            prefetch={false}
+          >
+            {nav.label}
+          </Link>
+        ))}
+      </nav>
+    )
   );
 };

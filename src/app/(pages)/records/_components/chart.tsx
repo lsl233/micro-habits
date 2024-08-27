@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
+import { TrendingUp } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -8,7 +8,7 @@ import {
   LabelList,
   XAxis,
   YAxis,
-} from "recharts"
+} from "recharts";
 
 import {
   Card,
@@ -17,15 +17,18 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import dayjs from "dayjs"
+} from "@/components/ui/card";
+import dayjs from "dayjs";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { RecordWithHabit } from "@/types"
+} from "@/components/ui/chart";
+import { RecordWithHabit } from "@/types";
+import Select from "@/components/ui/wrap/select";
+import { Habit } from "@prisma/client";
+import { useCallback, useEffect, useState } from "react";
 
 const chartConfig = {
   amount: {
@@ -35,18 +38,63 @@ const chartConfig = {
   label: {
     color: "hsl(var(--background))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-const Chart = ({ records }: { records: RecordWithHabit[] }) => {
-  const chartData = records.map((record) => ({
-    date: dayjs(record.createdAt).format("YYYY-MM-DD"),
-    amount: record.amount,
-  }))
+const Chart = ({
+  records,
+  habits,
+}: {
+  records: RecordWithHabit[];
+  habits: Habit[];
+}) => {
+  const [chartData, setChartData] = useState<
+    { date: string; amount: number }[]
+  >([]);
+  const [selectData, setSelectData] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [selectedHabitId, setSelectedHabitId] = useState<string>("");
+  useEffect(() => {
+    const chartData = [];
+    for (const record of records) {
+      if (record.habitId === selectedHabitId) {
+        chartData.push({
+          date: dayjs(record.createdAt).format("YYYY-MM-DD"),
+          amount: record.amount,
+        });
+      }
+    }
+    setChartData(chartData);
+  }, [records, selectedHabitId]);
+
+  useEffect(() => {
+    const selectData = habits.map((habit) => ({
+      id: habit.id,
+      name: habit.action,
+    }));
+    setSelectData(selectData);
+    if (selectData.length > 0) {
+      setSelectedHabitId(selectData[0].id);
+    }
+  }, [habits]);
+
+  const handleSelectChange = useCallback((value: string) => {
+    setSelectedHabitId(value);
+  }, []);
+
   return (
     <div className="w-full">
-      <CardHeader>
-        <CardTitle>Bar Chart - Custom Label</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+      <CardHeader className="p-0">
+        <CardTitle>
+          <Select
+            value={selectedHabitId}
+            data={selectData}
+            placeholder={"选择一个习惯"}
+            selectTrigger={{ className: "w-48" }}
+            onChange={handleSelectChange}
+          />
+        </CardTitle>
+        {/* <CardDescription>January - June 2024</CardDescription> */}
       </CardHeader>
       <CardContent className="p-0">
         <ChartContainer config={chartConfig}>
@@ -95,7 +143,7 @@ const Chart = ({ records }: { records: RecordWithHabit[] }) => {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
+      <CardFooter className="flex-col items-start gap-2 text-sm p-0">
         <div className="flex gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
@@ -104,7 +152,7 @@ const Chart = ({ records }: { records: RecordWithHabit[] }) => {
         </div>
       </CardFooter>
     </div>
-  )
-}
+  );
+};
 
-export default Chart
+export default Chart;
