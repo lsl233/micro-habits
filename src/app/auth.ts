@@ -44,19 +44,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .update(password)
             .digest("hex");
 
-          // logic to verify if the user exists
           user = await db.user.findFirst({
             where: {
               email,
               password: pwHash,
             },
+            select: {
+              id: true,
+              email: true,
+            },
           });
+
+          console.log("[user id]", user?.id);
 
           if (!user) {
             throw new Error("User not found.");
           }
 
-          // return JSON object with the user data
           return user;
         } catch (error) {
           console.error("[error]", error);
@@ -69,6 +73,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    jwt: ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
+  },
   pages: {
     signIn: "/auth/sign-in",
   },

@@ -16,10 +16,11 @@ export default async function Home() {
   if (!user) {
     redirect("/auth/sign-in");
   }
+  console.log("[user id page]", user.id);
   // const todo: TodoWithHabit[] = await ;
   const habits: HabitWithRecords[] = await db.habit.findMany({
     where: {
-      userId: "abf7fcd1-7562-47f4-abff-a5387c765651",
+      userId: user.id,
     },
     include: {
       records: {

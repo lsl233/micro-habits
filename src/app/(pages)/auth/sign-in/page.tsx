@@ -42,6 +42,7 @@ const SignInPage = () => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     await fetch("/api/auth/sign-in", { method: "POST", body: JSON.stringify(data) });
     router.replace("/");
+    router.refresh();
   };
 
   return (
