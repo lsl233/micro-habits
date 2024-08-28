@@ -29,6 +29,8 @@ import { Unit, CycleTimeType } from "@/lib/enum";
 import { enumKeys } from "@/lib/utils";
 import { Habit } from "@prisma/client";
 import { useState } from "react";
+import { auth } from "@/app/auth";
+import { useSession } from "next-auth/react";
 
 const FormSchema = z.object({
   id: z.string().or(z.undefined()),
@@ -60,6 +62,10 @@ const defaultValues = {
 
 const HabitForm = ({ habit }: HabitFormProps) => {
   const router = useRouter();
+  const session = useSession();
+  if (!session.data?.user) {
+    router.replace("/auth/sign-in");
+  }
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const units = enumKeys(Unit);
@@ -81,7 +87,7 @@ const HabitForm = ({ habit }: HabitFormProps) => {
         delete data.id;
         await axios.post("/api/habits", {
           ...data,
-          userId: "abf7fcd1-7562-47f4-abff-a5387c765651",
+          userId: session.data?.user?.id,
         });
       }
       router.replace("/");

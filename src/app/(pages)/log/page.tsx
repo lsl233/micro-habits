@@ -1,10 +1,15 @@
+import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { CycleTimeType, Unit } from "@/lib/enum";
 import { RecordWithHabit } from "@/types";
 import dayjs from "dayjs";
 
 const LogPage = async () => {
+  const session = await auth();
   const records: RecordWithHabit[] = await db.record.findMany({
+    where: {
+      userId: session?.user?.id,
+    },
     include: {
       habit: true,
     },
