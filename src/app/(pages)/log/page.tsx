@@ -19,11 +19,11 @@ const LogPage = async () => {
   });
 
   return (
-    <ul className="w-full">
+    <ul className="w-full flex flex-col gap-y-2">
       {records.map((item) => (
         <li
           key={item.id}
-          className="border-b border-gray-200 py-1 text-gray-600 flex justify-between items-center"
+          className="border rounded py-2 px-3 border-gray-200 text-gray-600 flex justify-between items-center"
         >
           <div>
             <div className="text-gray-500 text-sm">{dayjs(item.createdAt).format("YYYY-MM-DD")}</div>

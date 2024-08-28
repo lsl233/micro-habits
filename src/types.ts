@@ -7,6 +7,7 @@ export interface TodayDayTodo
     completed: boolean;
     loading: boolean;
     id?: string;
+    actualAmount?: number;
 }
 
 export type TodoWithHabit = Prisma.TodoGetPayload<{

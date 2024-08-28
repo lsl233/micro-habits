@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CycleTimeType, Unit } from "@/lib/enum";
+import { cn } from "@/lib/utils";
 import { TodayDayTodo } from "@/types";
 import axios from "axios";
 import { LoaderCircle, Square, SquareCheckBig } from "lucide-react";
@@ -43,27 +44,36 @@ export const TodoItem = ({
     }
   };
   return (
-    <div className="flex justify-between items-center border rounded-md py-2 px-3">
-      <Link href={`/habits/${todo.habitId}`}>
-        <h2 className="text-md">{`${CycleTimeType[Number(todo.cycleTimeType)]}${
-          todo.action
-        } ${todo.amount} ${Unit[Number(todo.unit)]}`}</h2>
-      </Link>
+    <div className="border rounded py-2 px-3">
+      <div className=" w-full flex justify-between items-center">
+        <Link href={`/habits/${todo.habitId}`}>
+          <h2 className={cn("text-md", completed && "line-through text-gray-500")}>{`${
+            CycleTimeType[Number(todo.cycleTimeType)]
+          }${todo.action} ${todo.amount} ${Unit[Number(todo.unit)]}`}</h2>
+        </Link>
 
-      <Button
-        onClick={handleClickButton}
-        variant="link"
-        size="icon"
-        className="h-auto"
-      >
-        {loading ? (
-          <LoaderCircle className="animate-spin" />
-        ) : completed ? (
-          <SquareCheckBig />
-        ) : (
-          <Square className="text-gray-500" />
-        )}
-      </Button>
+        <Button
+          onClick={handleClickButton}
+          variant="link"
+          size="icon"
+          className="h-auto w-auto"
+        >
+          {loading ? (
+            <LoaderCircle className="animate-spin" />
+          ) : completed ? (
+            <SquareCheckBig />
+          ) : (
+            <Square className="text-gray-500" />
+          )}
+        </Button>
+      </div>
+      {todo.completed && (
+        <div className="pt-2 mt-2 text-right border-t border-gray-200">
+          实际完成：
+          <span className="text-black font-bold">{todo.actualAmount}</span>
+          &nbsp;{Unit[Number(todo.unit)]}
+        </div>
+      )}
     </div>
   );
 };

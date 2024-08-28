@@ -48,6 +48,7 @@ export default async function Home() {
         id: records.length > 0 ? records[0].id : "",
         habitId: habit.id,
         amount: habit.amount,
+        actualAmount: records.length > 0 ? records[0].amount : 0,
         userId: habit.userId,
         action: habit.action,
         unit: habit.unit,

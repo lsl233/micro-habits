@@ -72,7 +72,7 @@ const CompleteDrawer = ({ todo, open, switchDrawer }: { todo?: TodayDayTodo; ope
 
   return (
     <Drawer open={open}>
-      <DrawerContent>
+      <DrawerContent className="max-w-screen-md mx-auto">
         <DrawerHeader>
           <DrawerTitle>记录数值</DrawerTitle>
           <DrawerDescription>记录你实际完成的具体数值</DrawerDescription>

@@ -32,7 +32,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="flex min-h-screen flex-col items-start p-4">
+        <main className="flex max-w-screen-md mx-auto min-h-screen flex-col items-start p-4">
           <SessionProvider session={session}>
             <header className="flex justify-between items-center w-full mb-6">
               <Link href="/">
