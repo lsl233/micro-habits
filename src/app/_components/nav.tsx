@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const naves = [
@@ -21,7 +21,6 @@ const naves = [
 ];
 
 export const Nav = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const [isNavHref, setIsNavHref] = useState(false);
 

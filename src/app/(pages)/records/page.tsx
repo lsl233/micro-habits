@@ -10,6 +10,9 @@ const RecordsPage = async () => {
     include: {
       habit: true,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   const habits = await db.habit.findMany();

@@ -29,7 +29,13 @@ export default async function Home() {
             lt: new Date(new Date().setHours(23, 59, 59, 999)),
           },
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       },
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 

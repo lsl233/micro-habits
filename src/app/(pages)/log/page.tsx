@@ -8,6 +8,9 @@ const LogPage = async () => {
     include: {
       habit: true,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return (
