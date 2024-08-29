@@ -1,4 +1,4 @@
-import { Habit, Prisma, Todo } from "@prisma/client";
+import { Habit, Prisma, Todo, Record } from "@prisma/client";
 import { Optional } from "@prisma/client/runtime/library";
 
 export interface TodayDayTodo
@@ -8,6 +8,7 @@ export interface TodayDayTodo
     loading: boolean;
     id?: string;
     actualAmount?: number;
+    records?: Record[];
 }
 
 export type TodoWithHabit = Prisma.TodoGetPayload<{

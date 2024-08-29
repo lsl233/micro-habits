@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import WeekHeatmap from "./week-heatmap";
 
 export const TodoItem = ({
   todo,
@@ -68,10 +69,13 @@ export const TodoItem = ({
         </Button>
       </div>
       {todo.completed && (
-        <div className="pt-2 mt-2 text-right border-t border-gray-200">
-          实际完成：
-          <span className="text-black font-bold">{todo.actualAmount}</span>
+        <div className="pt-2 mt-2 text-right border-t border-gray-200 flex justify-between">
+          <WeekHeatmap records={todo.records || []} />
+          <div>
+            今日完成：
+            <span className="text-black font-bold">{todo.actualAmount}</span>
           &nbsp;{Unit[Number(todo.unit)]}
+          </div>
         </div>
       )}
     </div>

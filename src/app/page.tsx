@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CalendarPlus, Plus } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { HabitWithRecords, TodayDayTodo, TodoWithHabit } from "@/types";
@@ -17,7 +17,6 @@ export default async function Home() {
     redirect("/auth/sign-in");
   }
   console.log("[user id page]", user.id);
-  // const todo: TodoWithHabit[] = await ;
   const habits: HabitWithRecords[] = await db.habit.findMany({
     where: {
       userId: user.id,
@@ -26,8 +25,8 @@ export default async function Home() {
       records: {
         where: {
           createdAt: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
-            lt: new Date(new Date().setHours(23, 59, 59, 999)),
+            gte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 1)),
+            lt: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 6)),
           },
         },
         orderBy: {
@@ -55,6 +54,7 @@ export default async function Home() {
         loading: false,
         cycleTimeType: habit.cycleTimeType,
         completed: records.length > 0,
+        records,
       });
     });
   };
