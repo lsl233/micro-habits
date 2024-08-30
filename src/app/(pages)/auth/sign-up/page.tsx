@@ -59,6 +59,7 @@ const SignUpPage = () => {
       setLoading(true)
       await fetch('/api/auth/sign-up', { method: 'POST', body: JSON.stringify(data) })
       router.replace("/")
+      router.refresh()
     } finally {
       setLoading(false)
     }

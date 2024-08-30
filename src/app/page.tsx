@@ -6,6 +6,7 @@ import { HabitWithRecords, TodayDayTodo, TodoWithHabit } from "@/types";
 import { TodoList } from "./_components/todo-list";
 import { auth } from "./auth";
 import { redirect } from "next/navigation";
+import dayjs from "dayjs";
 
 // export const dynamic = "force-dynamic";
 
@@ -42,18 +43,25 @@ export default async function Home() {
   const generateTodayTodo = (habits: HabitWithRecords[]) => {
     habits.forEach((habit) => {
       const records = habit.records;
-
+      let completed = false;
+      if (records.length > 0) {
+        completed = dayjs(records[0].createdAt).isSame(dayjs().startOf('day'), 'day');
+      }
+      console.log(records)
+      console.log(habit)
+      console.log(completed)
+      
       todayTodo.push({
         id: records.length > 0 ? records[0].id : "",
         habitId: habit.id,
         amount: habit.amount,
-        actualAmount: records.length > 0 ? records[0].amount : 0,
+        actualAmount: completed ? records[0].amount : 0,
         userId: habit.userId,
         action: habit.action,
         unit: habit.unit,
         loading: false,
         cycleTimeType: habit.cycleTimeType,
-        completed: records.length > 0,
+        completed,
         records,
       });
     });
